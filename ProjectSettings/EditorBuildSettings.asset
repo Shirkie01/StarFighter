@@ -4,4 +4,10 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Starfighter/Scenes/Lobby.unity
+    guid: a5621581c6cfe3a448f823233af9e7fd
+  - enabled: 1
+    path: Assets/Starfighter/Scenes/TestPlayfield.unity
+    guid: 706af013f7b7f5646a551669c879ac27
