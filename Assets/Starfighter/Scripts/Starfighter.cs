@@ -6,33 +6,32 @@ public class Starfighter : NetworkBehaviour
     [SyncVar]
     public Color color;
 
+    private float acceleration = 50;
+    private float minSpeed = 35;
+    private float midSpeed = 70;
+    private float maxSpeed = 95;
+
+    public float Speed { get; private set; }
+
     private float rotationRate = 60; // degrees per second
-    private float maxSpeed = 100; // meters per second
 
     private Vector3 input;
 
-    private float throttle;
-
-    public float Throttle
-    {
-        get
-        {
-            return throttle;
-        }
-        set
-        {
-            throttle = Mathf.Clamp01(value);
-        }
-    }
-
     private bool inverted;
+
+    [SerializeField]
+    private Weapon primaryWeapon;
+
+    [SerializeField]
+    private Weapon secondaryWeapon;
 
     // Use this for initialization
     private void Start()
     {
+        Debug.Log("Client: Start");
         ChangeColor(color);
 
-        if (!isLocalPlayer)
+        if (!hasAuthority)
         {
             enabled = false;
             return;
@@ -56,7 +55,9 @@ public class Starfighter : NetworkBehaviour
     {
         // Rotation on the x-axis is pitch, rotation on the y-axis is yaw, rotation on the z-axis is roll
         input = new Vector3(Input.GetAxis("Vertical") * (inverted ? -1 : 1), Input.GetAxis("Horizontal"), Input.GetAxis("Roll")) * rotationRate;
-        UpdateThrottle();
+
+        // Currently instantaneous transition. Should be modified to use acceleration parameter.
+        Speed = Input.GetKey(KeyCode.LeftShift) ? maxSpeed : midSpeed;
 
         // If user presses 'O', look at the origin. This is meant to help find other ships until
         // there are recognizable landmarks
@@ -64,24 +65,15 @@ public class Starfighter : NetworkBehaviour
         {
             transform.LookAt(Vector3.zero);
         }
-    }
 
-    private void UpdateThrottle()
-    {
-        // Punch it!
-        if (Input.GetKeyDown(KeyCode.Z))
+        if (Input.GetMouseButtonDown(0))
         {
-            Throttle = 1;
+            FirePrimaryWeapon();
         }
 
-        if (Input.GetKey(KeyCode.LeftShift))
+        if (Input.GetMouseButtonDown(1))
         {
-            Throttle += Time.deltaTime;
-        }
-
-        if (Input.GetKey(KeyCode.LeftControl))
-        {
-            Throttle -= Time.deltaTime;
+            FireSecondaryWeapon();
         }
     }
 
@@ -90,11 +82,23 @@ public class Starfighter : NetworkBehaviour
         transform.Rotate(Vector3.right, input.x * Time.fixedDeltaTime);
         transform.Rotate(Vector3.up, input.y * Time.fixedDeltaTime);
         transform.Rotate(Vector3.forward, input.z * Time.fixedDeltaTime);
-        transform.Translate(Vector3.forward * throttle * maxSpeed * Time.fixedDeltaTime);
+        transform.Translate(Vector3.forward * Speed * Time.fixedDeltaTime);
     }
 
     private void OnGUI()
     {
-        GUILayout.Label(string.Format("Throttle : {0:P1}", Throttle));
+        GUILayout.Label(transform.position.ToString());
+    }
+
+    private void FirePrimaryWeapon()
+    {
+        Debug.Log(nameof(FirePrimaryWeapon));
+        primaryWeapon.Fire();
+    }
+
+    private void FireSecondaryWeapon()
+    {
+        Debug.Log(nameof(FireSecondaryWeapon));
+        secondaryWeapon.Fire();
     }
 }

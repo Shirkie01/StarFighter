@@ -6,8 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Starfighter/Scenes/Lobby.unity
-    guid: a5621581c6cfe3a448f823233af9e7fd
+    path: Assets/Starfighter/Scenes/BasicLobby.unity
+    guid: 0377f07773918194da6a42fbf5a2cb66
   - enabled: 1
     path: Assets/Starfighter/Scenes/TestPlayfield.unity
     guid: 706af013f7b7f5646a551669c879ac27
+  m_configObjects: {}
