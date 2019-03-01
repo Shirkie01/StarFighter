@@ -1,6 +1,9 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UI;
 
+[RequireComponent(typeof(Vitality))]
 public class Starfighter : NetworkBehaviour
 {
     [SyncVar]
@@ -20,15 +23,26 @@ public class Starfighter : NetworkBehaviour
     private bool inverted;
 
     [SerializeField]
-    private Weapon primaryWeapon;
+    private Weapon[] primaryWeapons;
+
+    private int primaryWeaponIndex = 0;
+    private bool canFire = true;
+    private float cooldown = 0.3f;
 
     [SerializeField]
-    private Weapon secondaryWeapon;
+    private Weapon[] secondaryWeapons;
+
+    private int secondaryWeaponIndex = 0;
+
+    private Vitality vitality;
+    private Slider healthSlider;
+
+    public PlayerConnection playerConnection;
 
     // Use this for initialization
     private void Start()
     {
-        Debug.Log("Client: Start");
+        // Do this on all clients
         ChangeColor(color);
 
         if (!hasAuthority)
@@ -41,6 +55,14 @@ public class Starfighter : NetworkBehaviour
         cam.transform.parent = transform;
         cam.transform.localPosition = new Vector3(0, 5, -20);
         cam.transform.localRotation = Quaternion.identity;
+
+        if (primaryWeapons == null)
+        {
+            Debug.Log($"{name} does not have any primary weapons! Good luck I guess");
+        }
+
+        vitality = GetComponent<Vitality>();
+        healthSlider = GameObject.Find("HealthSlider").GetComponent<Slider>();
     }
 
     private void ChangeColor(Color color)
@@ -66,7 +88,12 @@ public class Starfighter : NetworkBehaviour
             transform.LookAt(Vector3.zero);
         }
 
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            vitality.TakeDamage(100);
+        }
+
+        if (Input.GetMouseButton(0))
         {
             FirePrimaryWeapon();
         }
@@ -83,6 +110,8 @@ public class Starfighter : NetworkBehaviour
         transform.Rotate(Vector3.up, input.y * Time.fixedDeltaTime);
         transform.Rotate(Vector3.forward, input.z * Time.fixedDeltaTime);
         transform.Translate(Vector3.forward * Speed * Time.fixedDeltaTime);
+
+        healthSlider.value = vitality.HealthRatio;
     }
 
     private void OnGUI()
@@ -92,13 +121,38 @@ public class Starfighter : NetworkBehaviour
 
     private void FirePrimaryWeapon()
     {
-        Debug.Log(nameof(FirePrimaryWeapon));
-        primaryWeapon.Fire();
+        if (!canFire)
+        {
+            return;
+        }
+        StartCoroutine(Cooldown(cooldown));
+
+        if (primaryWeaponIndex >= primaryWeapons.Length)
+        {
+            primaryWeaponIndex = 0;
+        }
+        primaryWeapons[primaryWeaponIndex++].Fire();
     }
 
     private void FireSecondaryWeapon()
     {
-        Debug.Log(nameof(FireSecondaryWeapon));
-        secondaryWeapon.Fire();
+        if (secondaryWeaponIndex >= secondaryWeapons.Length)
+        {
+            secondaryWeaponIndex = 0;
+        }
+        secondaryWeapons[secondaryWeaponIndex++].Fire();
+    }
+
+    private void OnDestroyed()
+    {
+        Camera.main.transform.parent = null;
+        StartCoroutine(playerConnection.Respawn());
+    }
+
+    private IEnumerator Cooldown(float cooldownTime)
+    {
+        canFire = false;
+        yield return new WaitForSeconds(cooldownTime);
+        canFire = true;
     }
 }

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 [RequireComponent(typeof(AudioSource))]
 public class MusicManager : MonoBehaviour
@@ -10,6 +11,7 @@ public class MusicManager : MonoBehaviour
 
     private void Awake()
     {
+        DontDestroyOnLoad(gameObject);
         clips = Resources.LoadAll<AudioClip>("Music");
         if (clips == null)
         {
@@ -19,10 +21,7 @@ public class MusicManager : MonoBehaviour
         }
 
         audioSource = GetComponent<AudioSource>();
-
-        currentIndex = Random.Range(0, clips.Length - 1);
-        audioSource.clip = clips[currentIndex];
-        audioSource.Play();
+        StartCoroutine(PlayTrack());
     }
 
     public void NextTrack()
@@ -47,5 +46,18 @@ public class MusicManager : MonoBehaviour
 
         audioSource.clip = clips[currentIndex];
         audioSource.Play();
+    }
+
+    private IEnumerator PlayTrack()
+    {
+        currentIndex = Random.Range(0, clips.Length - 1);
+        audioSource.clip = clips[currentIndex];
+        audioSource.Play();
+
+        while (true)
+        {
+            yield return new WaitForSeconds(audioSource.clip.length);
+            NextTrack();
+        }
     }
 }

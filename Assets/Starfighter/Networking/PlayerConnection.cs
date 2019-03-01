@@ -1,11 +1,12 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.Networking;
 
 public class PlayerConnection : NetworkBehaviour
 {
     [SerializeField]
+    private GameObject[] playerPrefabs;
+
     private GameObject player;
 
     /// <summary>
@@ -27,8 +28,15 @@ public class PlayerConnection : NetworkBehaviour
     {
         Debug.Log(nameof(OnStartLocalPlayer));
         CmdSpawnPlayer();
+    }
 
-        player.GetComponent<Starfighter>().enabled = true;
+    [ClientRpc]
+    private void RpcSpawnPlayerCallback()
+    {
+        if (hasAuthority)
+        {
+            player.GetComponent<Starfighter>().enabled = true;
+        }
     }
 
     [Server]
@@ -40,20 +48,28 @@ public class PlayerConnection : NetworkBehaviour
             return;
         }
 
-        if (player == null)
+        if (playerPrefabs == null)
         {
-            Debug.Log("Server: 'Player' was not assigned");
+            Debug.Log("Server: 'PlayerPrefabs' were not assigned");
         }
 
-        GameObject go = Instantiate(player);
-        go.transform.position = UnityEngine.Random.insideUnitSphere * 500;
-        if (!NetworkServer.SpawnWithClientAuthority(go, connectionToClient))
+        if (player != null)
+        {
+            NetworkServer.Destroy(player);
+        }
+
+        player = Instantiate(playerPrefabs[Random.Range(0, playerPrefabs.Length - 1)]);
+        player.transform.position = Random.insideUnitSphere * 500;
+        player.GetComponent<Starfighter>().playerConnection = this;
+        if (!NetworkServer.SpawnWithClientAuthority(player, connectionToClient))
         {
             Debug.Log("Server: Failed to spawn player");
         }
+
+        RpcSpawnPlayerCallback();
     }
 
-    private IEnumerator WaitForReady(Action action)
+    private IEnumerator WaitForReady(System.Action action)
     {
         while (!connectionToClient.isReady)
         {
@@ -61,5 +77,12 @@ public class PlayerConnection : NetworkBehaviour
         }
 
         action();
+    }
+
+    public IEnumerator Respawn()
+    {
+        Debug.Log("Respawn started...");
+        yield return new WaitForSeconds(3);
+        CmdSpawnPlayer();
     }
 }
