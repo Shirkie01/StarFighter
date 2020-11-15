@@ -1,6 +1,6 @@
-﻿using System.Collections;
+﻿using Mirror;
+using System.Collections;
 using UnityEngine;
-using UnityEngine.Networking;
 
 public class PlayerConnection : NetworkBehaviour
 {
@@ -61,10 +61,7 @@ public class PlayerConnection : NetworkBehaviour
         player = Instantiate(playerPrefabs[Random.Range(0, playerPrefabs.Length - 1)]);
         player.transform.position = Random.insideUnitSphere * 500;
         player.GetComponent<Starfighter>().playerConnection = this;
-        if (!NetworkServer.SpawnWithClientAuthority(player, connectionToClient))
-        {
-            Debug.Log("Server: Failed to spawn player");
-        }
+        NetworkServer.Spawn(player, connectionToClient);
 
         RpcSpawnPlayerCallback();
     }

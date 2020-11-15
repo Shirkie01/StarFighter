@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using UnityEngine.Networking;
+﻿using Mirror;
+using UnityEngine;
 
 [RequireComponent(typeof(AudioSource))]
 public abstract class Weapon : NetworkBehaviour
