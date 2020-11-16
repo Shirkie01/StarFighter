@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using Mirror;
+﻿using Mirror;
+using UnityEngine;
 
 public class Laser : Weapon
 {
@@ -20,7 +20,7 @@ public class Laser : Weapon
     {
         GameObject go = Instantiate(laserBolt, spawnTransform.position, spawnTransform.rotation);
         var rb = go.GetComponent<Rigidbody>();
-        rb.AddRelativeForce(Vector3.forward * GetComponentInParent<Starfighter>().Speed * 10f, ForceMode.VelocityChange);
+        rb.AddRelativeForce(Vector3.forward * (GetComponentInParent<Starfighter>().Speed * 10f), ForceMode.VelocityChange);
         NetworkServer.Spawn(go);
     }
 }

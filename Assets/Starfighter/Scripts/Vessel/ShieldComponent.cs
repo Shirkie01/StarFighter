@@ -1,18 +1,21 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using Mirror;
 using UnityEngine;
 
-public class ShieldComponent : MonoBehaviour
+public class ShieldComponent : VesselComponent
 {
-    // Start is called before the first frame update
-    void Start()
+    [SerializeField]
+    private float maxStrength;
+
+    [SyncVar(hook = nameof(OnShieldStrengthChanged))]
+    private float strength;
+
+    public override void OnStartServer()
     {
-        
+        base.OnStartServer();
+        strength = maxStrength;
     }
 
-    // Update is called once per frame
-    void Update()
+    protected void OnShieldStrengthChanged(float oldValue, float newValue)
     {
-        
     }
 }

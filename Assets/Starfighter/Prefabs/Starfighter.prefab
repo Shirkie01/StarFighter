@@ -350,6 +350,8 @@ GameObject:
   - component: {fileID: 2597503296095380968}
   - component: {fileID: 600419481993800879}
   - component: {fileID: 2217351549242874105}
+  - component: {fileID: 4632209718531017526}
+  - component: {fileID: 7683694832314058552}
   m_Layer: 0
   m_Name: Starfighter
   m_TagString: Untagged
@@ -409,7 +411,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  color: {r: 0, g: 0, b: 0, a: 0}
   primaryWeapons:
   - {fileID: 2364518244528105609}
   - {fileID: 8177797296543320605}
@@ -476,6 +477,36 @@ MonoBehaviour:
   syncInterval: 0.1
   maxHealth: 2250
   destroyedPrefab: {fileID: 0}
+--- !u!114 &4632209718531017526
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1781206106545364}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afb82720c2c67404bb03dbf4ec1e9f82, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+--- !u!114 &7683694832314058552
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1781206106545364}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6bb5f4b62ad98245853953b6fd948ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  velocity: 100
+  velocityMultiplier: 0.5
 --- !u!1 &1797719361390248
 GameObject:
   m_ObjectHideFlags: 0

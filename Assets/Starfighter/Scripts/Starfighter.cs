@@ -1,21 +1,14 @@
-﻿using System.Collections;
+﻿using Mirror;
+using System.Collections;
 using UnityEngine;
-using Mirror;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(Vitality))]
+[RequireComponent(typeof(EngineComponent))]
+[RequireComponent(typeof(NetworkTransform))]
+[RequireComponent(typeof(Rigidbody))]
 public class Starfighter : NetworkBehaviour
 {
-    [SyncVar]
-    public Color color;
-
-    private float acceleration = 50;
-    private float minSpeed = 35;
-    private float midSpeed = 70;
-    private float maxSpeed = 95;
-
-    public float Speed { get; private set; }
-
     private float rotationRate = 60; // degrees per second
 
     private Vector3 input;
@@ -39,12 +32,19 @@ public class Starfighter : NetworkBehaviour
 
     public PlayerConnection playerConnection;
 
+    private EngineComponent engines;
+    private Rigidbody rb;
+    public float Speed => engines.MaximumVelocity;
+
+    private void Awake()
+    {
+        engines = GetComponent<EngineComponent>();
+        rb = GetComponent<Rigidbody>();
+    }
+
     // Use this for initialization
     private void Start()
     {
-        // Do this on all clients
-        ChangeColor(color);
-
         if (!hasAuthority)
         {
             enabled = false;
@@ -65,21 +65,11 @@ public class Starfighter : NetworkBehaviour
         healthSlider = GameObject.Find("HealthSlider").GetComponent<Slider>();
     }
 
-    private void ChangeColor(Color color)
-    {
-        Renderer[] rends = GetComponentsInChildren<Renderer>();
-        foreach (Renderer r in rends)
-            r.material.color = color;
-    }
-
     // Update is called once per frame
     private void Update()
     {
         // Rotation on the x-axis is pitch, rotation on the y-axis is yaw, rotation on the z-axis is roll
         input = new Vector3(Input.GetAxis("Vertical") * (inverted ? -1 : 1), Input.GetAxis("Horizontal"), Input.GetAxis("Roll")) * rotationRate;
-
-        // Currently instantaneous transition. Should be modified to use acceleration parameter.
-        Speed = Input.GetKey(KeyCode.LeftShift) ? maxSpeed : midSpeed;
 
         // If user presses 'O', look at the origin. This is meant to help find other ships until
         // there are recognizable landmarks
@@ -143,7 +133,7 @@ public class Starfighter : NetworkBehaviour
         secondaryWeapons[secondaryWeaponIndex++].Fire();
     }
 
-    private void OnDestroyed()
+    private void OnDestroy()
     {
         Camera.main.transform.parent = null;
         StartCoroutine(playerConnection.Respawn());

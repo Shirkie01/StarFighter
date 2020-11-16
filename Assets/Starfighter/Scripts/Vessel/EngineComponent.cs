@@ -1,18 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class EngineComponent : MonoBehaviour
+public class EngineComponent : VesselComponent
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    [SerializeField]
+    private float velocity;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    [SerializeField]
+    private float velocityMultiplier;
+
+    public float MaximumVelocity => velocity + (Power - 1) * velocityMultiplier;
 }

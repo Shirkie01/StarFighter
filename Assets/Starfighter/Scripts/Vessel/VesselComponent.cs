@@ -1,18 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using Mirror;
 
-public class VesselComponent : MonoBehaviour
+public abstract class VesselComponent : NetworkBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    [SyncVar(hook = nameof(OnPowerChanged))]
+    private float power = 1;
 
-    // Update is called once per frame
-    void Update()
+    public float Power => power;
+
+    private void OnPowerChanged(float oldValue, float newValue)
     {
-        
     }
 }
